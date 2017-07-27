@@ -230,18 +230,13 @@ class outdoor_lights(appapi.my_appapi):
         if newstate in ["home","house","Home","House"]:  # deal with having multiple versions of house and home to account for.
           tmpstate="home"
         elif self.targets[target]["triggers"][trigger]["type"]=="time":
-          if len(newstate)<8:
-            newstate=newstate+":00"
-          self.log("checking time {} - {}".format(newstate,self.targets[target]["triggers"][trigger]))
           for event in self.targets[target]["triggers"][trigger]["time"]:
-            self.log("event={} target={} trigger={}".format(event,target,trigger))  
-            self.log("on={} off={}".format(self.targets[target]["triggers"][trigger]["time"][event]["on"],self.targets[target]["triggers"][trigger]["time"][event]["off"]))
-            curtime=self.parse_time(newstate)
-            if self.parse_time(self.targets[target]["triggers"][trigger]["time"][event]["on"])<curtime<self.parse_time(self.targets[target]["triggers"][trigger]["time"][event]["off"]):
-              self.log("we are in the on time")
+            starttime=self.targets[target]["triggers"][trigger]["time"][event]["on"]
+            endtime=self.targets[target]["triggers"][trigger]["time"][event]["off"]
+            self.log("checking Start={}  End={}".format(starttime,endtime))
+            if self.now_is_between(starttime,endtime):
               tmpstate="on"
             else:
-              self.log("off time")
               tmpstate="off"
           
         else:
